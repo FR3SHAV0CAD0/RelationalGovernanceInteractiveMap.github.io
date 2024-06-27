@@ -1,145 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Relational Governance Interactive Maps</title>
-<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-<link href="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
-<style>
-body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; }
-#menu {
-    background: #fff;
-    position: absolute;
-    z-index: 1;
-    top: 10px;
-    right: 10px;
-    border-radius: 3px;
-    width: 120px;
-    border: 1px solid rgba(0, 0, 0, 0.4);
-    font-family: 'Open Sans', sans-serif;
-}
-#menu a {
-    font-size: 13px;
-    color: #404040;
-    display: block;
-    margin: 0;
-    padding: 0;
-    padding: 10px;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-    text-align: center;
-}
-#menu a:last-child {
-    border: none;
-}
-#menu a:hover {
-    background-color: #f8f8f8;
-    color: #404040;
-}
-#menu a.active {
-    background-color: #3887be;
-    color: #ffffff;
-}
-#menu a.active:hover {
-    background: #3074a4;
-}
-</style>
+    <meta charset="utf-8">
+    <title>Relational Governance Interactive Maps</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
 </head>
 <body>
-<nav id="menu"></nav>
-<div id="map"></div>
-<script>
-mapboxgl.accessToken = 'pk.eyJ1IjoiY2xhaXJpY2UtbWFwcyIsImEiOiJjbHh2NTY4aTYwbnhxMmtwajlvY2dicHN2In0.KRRnfIcCAsQoPZvbrUrpvg';
-const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v11',
-    center: [-114.3718, 62.4540],
-    zoom: 4
-});
-
-map.on('load', () => {
-    // Add sources and layers
-    const layers = [
-        { id: 'clairice-maps.6lmh67ua', label: 'Relational', color: 'rgba(25,165,71,1)', source: 'RelationalGovernancewithNatio-9dqyuo', url: 'mapbox://clairice-maps.6lmh67ua' },
-        { id: 'clairice-maps.2rl9k6bz', label: 'Federal', color: 'rgba(116,82,57,1)', source: 'Federalrelational-268mnk', url: 'mapbox://clairice-maps.2rl9k6bz' },
-        { id: 'clairice-maps.chrodc9z', label: 'Provincial On-Reserve', color: 'rgba(255,144,67,1)', source: 'ProvincialOn-2znvgn', url: 'mapbox://clairice-maps.chrodc9z' },
-        { id: 'clairice-maps.39oeelt2', label: 'Provincial Off-Reserve', color: 'rgba(232,137,232,1)', source: 'ProvincialOFF-7evmmd', url: 'mapbox://clairice-maps.39oeelt2' },
-        { id: 'clairice-maps.ayt4xk1v', label: 'Sole Delivery', color: 'rgba(241,59,60,1)', source: 'SoleDelivery-ce00bz', url: 'mapbox://clairice-maps.ayt4xk1v' },
-        { id: 'clairice-maps.1vlrlb44', label: 'Sole Delivery Mixed', color: 'rgba(70,93,205,1)', source: 'Sole_Delivery_MIxed-0f5zdi', url: 'mapbox://clairice-maps.1vlrlb44' }
-    ];
-
-    layers.forEach(layer => {
-        map.addSource(layer.source, {
-            type: 'vector',
-            url: layer.url
-        });
-        map.addLayer({
-            'id': layer.id,
-            'type': 'circle',
-            'source': layer.source,
-            'layout': {
-                'visibility': 'visible'
-            },
-            'paint': {
-                'circle-radius': 8,
-                'circle-color': layer.color
-            },
-            'source-layer': layer.source // Use the same identifier here
-        });
-        // Add label layer
-        map.addLayer({
-            'id': layer.id + '-label',
-            'type': 'symbol',
-            'source': layer.source,
-            'layout': {
-                'text-field': ['get', 'label'], // Assumes 'name' is the property with the label text
-                'text-size': 12
-            },
-            'paint': {
-                'text-color': '#000000'
-            },
-            'source-layer': layer.source // Use the same identifier here
-        });
-    });
-
-    map.on('idle', () => {
-        if (layers.some(layer => !map.getLayer(layer.id))) {
-            return;
-        }
-
-        layers.forEach(layer => {
-            if (document.getElementById(layer.id)) return;
-
-            const link = document.createElement('a');
-            link.id = layer.id;
-            link.href = '#';
-            link.textContent = layer.label; // Use custom label here
-            link.className = 'active';
-
-            link.onclick = function (e) {
-                const clickedLayer = this.id; // Use ID instead of text content
-                e.preventDefault();
-                e.stopPropagation();
-
-                const visibility = map.getLayoutProperty(clickedLayer, 'visibility');
-
-                if (visibility === 'visible') {
-                    map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-                    map.setLayoutProperty(clickedLayer + '-label', 'visibility', 'none');
-                    this.className = '';
-                } else {
-                    this.className = 'active';
-                    map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
-                    map.setLayoutProperty(clickedLayer + '-label', 'visibility', 'visible');
-                }
-            };
-
-            document.getElementById('menu').appendChild(link);
-        });
-    });
-});
-</script>
+    <nav id="menu"></nav>
+    <div id="map"></div>
+    <script src="script.js"></script>
 </body>
 </html>
