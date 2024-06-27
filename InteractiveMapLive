@@ -45,11 +45,36 @@ body { margin: 0; padding: 0; }
 #menu a.active:hover {
     background: #3074a4;
 }
+#legend {
+    background: #fff;
+    position: absolute;
+    z-index: 1;
+    bottom: 10px;
+    left: 10px;
+    border-radius: 3px;
+    padding: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+.legend-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
 </style>
 </head>
 <body>
 <nav id="menu"></nav>
 <div id="map"></div>
+<div id="legend"></div>
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2xhaXJpY2UtbWFwcyIsImEiOiJjbHh2NTY4aTYwbnhxMmtwajlvY2dicHN2In0.KRRnfIcCAsQoPZvbrUrpvg';
 const map = new mapboxgl.Map({
@@ -102,6 +127,23 @@ map.on('load', () => {
             },
             'source-layer': layer.source // Use the same identifier here
         });
+    });
+
+    const legend = document.getElementById('legend');
+    layers.forEach(layer => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+
+        const colorBox = document.createElement('div');
+        colorBox.className = 'legend-color';
+        colorBox.style.backgroundColor = layer.color;
+
+        const label = document.createElement('span');
+        label.textContent = layer.label;
+
+        item.appendChild(colorBox);
+        item.appendChild(label);
+        legend.appendChild(item);
     });
 
     map.on('idle', () => {
