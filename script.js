@@ -51,39 +51,6 @@ map.on('load', () => {
         });
     });
 
-    map.on('idle', () => {
-        if (layers.some(layer => !map.getLayer(layer.id))) {
-            return;
-        }
-
-        layers.forEach(layer => {
-            if (document.getElementById(layer.id)) return;
-
-            const link = document.createElement('a');
-            link.id = layer.id;
-            link.href = '#';
-            link.textContent = layer.label; // Use custom label here
-            link.className = 'active';
-
-            link.onclick = function (e) {
-                const clickedLayer = this.id; // Use ID instead of text content
-                e.preventDefault();
-                e.stopPropagation();
-
-                const visibility = map.getLayoutProperty(clickedLayer, 'visibility');
-
-                if (visibility === 'visible') {
-                    map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-                    map.setLayoutProperty(clickedLayer + '-label', 'visibility', 'none');
-                    this.className = '';
-                } else {
-                    this.className = 'active';
-                    map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
-                    map.setLayoutProperty(clickedLayer + '-label', 'visibility', 'visible');
-                }
-            };
-
-            document.getElementById('menu').appendChild(link);
-        });
-    });
-});
+    const legend = document.getElementById('legend');
+    layers.forEach(layer => {
+       
